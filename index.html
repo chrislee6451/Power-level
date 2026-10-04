@@ -1,1 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>KAKAROT — THE POWER TEST</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    background:
+        radial-gradient(circle at 50% 45%,
+        #263b52 0%,
+        #101c2d 30%,
+        #03060d 70%,
+        #000 100%);
+    color:white;
+    transition:background 1s;
+}
+
+#stars{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+}
+
+.star{
+    position:absolute;
+    width:2px;
+    height:2px;
+    background:white;
+    border-radius:50%;
+    box-shadow:0 0 8px white;
+    animation:starMove linear infinite;
+}
+
+@keyframes starMove{
+    from{
+        transform:translateY(110vh);
+        opacity:0;
+    }
+    20%{opacity:1}
+    to{
+        transform:translateY(-10vh);
+        opacity:0;
+    }
+}
+
+#aura{
+    position:fixed;
+    width:280px;
+    height:280px;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+
+    background:
+        radial-gradient(circle,
+        rgba(255,255,255,.9),
+        rgba(140,210,255,.45) 25%,
+        rgba(70,150,255,.2) 45%,
+        transparent 72%);
+
+    filter:blur(15px);
+    opacity:.25;
+
+    transition:
+        width 1s,
+        height 1s,
+        opacity 1s,
+        filter 1s;
+
+    animation:auraPulse 1.5s infinite alternate;
+}
+
+@keyframes auraPulse{
+    from{
+        transform:translate(-50%,-50%) scale(.85);
+    }
+    to{
+        transform:translate(-50%,-50%) scale(1.15);
+    }
+}
+
+#app{
+    position:relative;
+    z-index:10;
+
+    width:100%;
+    height:100%;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:20px;
+    text-align:center;
+
+    cursor:pointer;
+}
+
+.card{
+    width:min(92vw,520px);
+
+    padding:32px 23px;
+
+    border-radius:28px;
+
+    background:
+        linear-gradient(
+        145deg,
+        rgba(25,42,62,.88),
+        rgba(2,5,12,.95)
+        );
+
+    border:1px solid rgba(220,245,255,.4);
+
+    box-shadow:
+        0 0 35px rgba(90,180,255,.25),
+        inset 0 0 35px rgba(100,190,255,.07);
+
+    backdrop-filter:blur(16px);
+
+    animation:appear .7s ease;
+}
+
+@keyframes appear{
+    from{
+        opacity:0;
+        transform:scale(.8);
+    }
+    to{
+        opacity:1;
+        transform:scale(1);
+    }
+}
+
+.small{
+    font-size:11px;
+    letter-spacing:4px;
+    color:#9ec9e8;
+    margin-bottom:18px;
+}
+
+h1{
+    font-size:clamp(40px,12vw,72px);
+    line-height:.95;
+    letter-spacing:5px;
+
+    text-shadow:
+        0 0 8px white,
+        0 0 20px #bdeaff,
+        0 0 45px #4faaff;
+}
+
+h2{
+    margin-top:15px;
+    font-size:23px;
+    letter-spacing:2px;
+    color:#def3ff;
+
+    text-shadow:0 0 12px #55b5ff;
+}
+
+p{
+    margin-top:17px;
+    font-size:17px;
+    line-height:1.65;
+    color:#d6e7f2;
+}
+
+.symbol{
+    font-size:65px;
+    margin-bottom:8px;
+
+    animation:float 2s infinite alternate;
+}
+
+@keyframes float{
+    from{transform:translateY(0)}
+    to{transform:translateY(-10px)}
+}
+
+button{
+    display:block;
+
+    width:100%;
+
+    margin-top:18px;
+
+    padding:15px;
+
+    border:none;
+    border-radius:28px;
+
+    background:
+        linear-gradient(135deg,#f5fcff,#72c5ff);
+
+    color:#06111d;
+
+    font-size:16px;
+    font-weight:bold;
+
+    box-shadow:0 0 18px rgba(100,190,255,.5);
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+button:active{
+    transform:scale(.94);
+}
+
+.option{
+    background:rgba(255,255,255,.07);
+    color:#eaf7ff;
+
+    border:1px solid rgba(180,225,255,.25);
+
+    box-shadow:none;
+}
+
+.option.correct{
+    background:linear-gradient(135deg,#ffffff,#75caff);
+    color:#04101b;
+}
+
+.option.wrong{
+    opacity:.55;
+}
+
+#questionNumber{
+    margin-bottom:10px;
+    color:#7eb8df;
+    font-size:13px;
+    letter-spacing:2px;
+}
+
+#power{
+    margin-top:18px;
+
+    font-size:38px;
+    font-weight:bold;
+
+    color:white;
+
+    text-shadow:
+        0 0 10px white,
+        0 0 25px #68bdff,
+        0 0 50px #368fff;
+
+    transition:.25s;
+}
+
+#stage{
+    margin-top:10px;
+
+    font-size:15px;
+    font-weight:bold;
+
+    color:#c9edff;
+
+    text-shadow:0 0 10px #5bbaff;
+}
+
+.progressBox{
+    width:100%;
+    height:12px;
+
+    margin-top:20px;
+
+    border-radius:20px;
+
+    background:rgba(255,255,255,.1);
+
+    overflow:hidden;
+}
+
+#progress{
+    width:0%;
+    height:100%;
+
+    border-radius:20px;
+
+    background:
+        linear-gradient(
+        90deg,
+        white,
+        #6bc3ff,
+        #c6edff);
+
+    box-shadow:0 0 15px #65baff;
+
+    transition:.3s;
+}
+
+#tapHint{
+    margin-top:20px;
+
+    font-size:13px;
+
+    color:#9ebed2;
+
+    letter-spacing:2px;
+
+    animation:pulse 1s infinite alternate;
+}
+
+@keyframes pulse{
+    from{opacity:.45}
+    to{opacity:1}
+}
+
+.flash{
+    position:fixed;
+    inset:0;
+
+    background:white;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    z-index:100;
+}
+
+.flash.active{
+    animation:flash .25s;
+}
+
+@keyframes flash{
+    0%{opacity:.7}
+    100%{opacity:0}
+}
+
+.shake{
+    animation:shake .1s infinite;
+}
+
+@keyframes shake{
+    0%{transform:translate(2px,1px)}
+    25%{transform:translate(-2px,2px)}
+    50%{transform:translate(2px,-2px)}
+    75%{transform:translate(-2px,-1px)}
+    100%{transform:translate(1px,2px)}
+}
+
+#reset{
+    display:none;
+    margin-top:20px;
+    background:rgba(255,255,255,.08);
+    color:white;
+    border:1px solid rgba(255,255,255,.4);
+}
+
+.finalGlow{
+    animation:finalGlow 1s infinite alternate;
+}
+
+@keyframes finalGlow{
+    from{
+        text-shadow:
+        0 0 10px white,
+        0 0 25px #a8ddff;
+    }
+
+    to{
+        text-shadow:
+        0 0 15px white,
+        0 0 40px #8bd5ff,
+        0 0 90px #398fff;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="stars"></div>
+<div id="aura"></div>
+<div class="flash" id="flash"></div>
+
+<div id="app">
+
+<div class="card" id="card">
+
+<div id="content"></div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   STARS
+========================= */
+
+const stars=document.getElementById("stars");
+
+for(let i=0;i<100;i++){
+
+    const star=document.createElement("div");
+
+    star.className="star";
+
+    star.style.left=Math.random()*100+"%";
+
+    star.style.animationDuration=
+        (2+Math.random()*6)+"s";
+
+    star.style.animationDelay=
+        Math.random()*5+"s";
+
+    stars.appendChild(star);
+}
+
+
+/* =========================
+   VARIABLES
+========================= */
+
+const content=document.getElementById("content");
+
+const app=document.getElementById("app");
+
+const card=document.getElementById("card");
+
+const aura=document.getElementById("aura");
+
+const flash=document.getElementById("flash");
+
+let screen=0;
+
+let question=0;
+
+let taps=0;
+
+const maxTaps=25;
+
+
+/* =========================
+   QUESTIONS
+========================= */
+
+const questions=[
+
+{
+    text:"What is another name for Kakarot?",
+    options:["Goku","Vegeta","Broly"],
+    correct:0
+},
+
+{
+    text:"Who am I to you?",
+    options:["Best Bro 👊","Your Enemy 😈","A Random Guy 😂"],
+    correct:0
+},
+
+{
+    text:"What happens when Kakarot reaches his limit?",
+    options:["He gives up","He sleeps 😴","He breaks the limit 🔥"],
+    correct:2
+}
+
+];
+
+
+/* =========================
+   SHOW INTRO
+========================= */
+
+function intro(){
+
+content.innerHTML=`
+
+<div class="symbol">✦</div>
+
+<div class="small">
+A SECRET MESSAGE
+</div>
+
+<h1>
+KAKAROT
+</h1>
+
+<h2>
+YOUR POWER TEST BEGINS
+</h2>
+
+<p>
+Before you unlock your power...
+<br>
+I have a few questions for you.
+</p>
+
+<button id="start">
+BEGIN THE TEST ⚡
+</button>
+
+`;
+
+document.getElementById("start")
+.addEventListener("click",function(e){
+
+    e.stopPropagation();
+
+    question=0;
+
+    showQuestion();
+
+});
+
+}
+
+
+/* =========================
+   QUESTIONS
+========================= */
+
+function showQuestion(){
+
+screen=1;
+
+const q=questions[question];
+
+content.innerHTML=`
+
+<div id="questionNumber">
+QUESTION ${question+1} / ${questions.length}
+</div>
+
+<h2>
+${q.text}
+</h2>
+
+<div id="options"></div>
+
+<p id="answerMessage"></p>
+
+`;
+
+const options=
+document.getElementById("options");
+
+q.options.forEach((option,index)=>{
+
+    const btn=document.createElement("button");
+
+    btn.className="option";
+
+    btn.textContent=option;
+
+    btn.addEventListener("click",function(e){
+
+        e.stopPropagation();
+
+        checkAnswer(index,btn);
+
+    });
+
+    options.appendChild(btn);
+
+});
+
+}
+
+
+/* =========================
+   CHECK ANSWER
+========================= */
+
+function checkAnswer(index,button){
+
+const q=questions[question];
+
+const message=
+document.getElementById("answerMessage");
+
+if(index===q.correct){
+
+    button.classList.add("correct");
+
+    message.textContent=
+        "✅ CORRECT! POWER ACCEPTED.";
+
+    setTimeout(()=>{
+
+        question++;
+
+        if(question<questions.length){
+
+            showQuestion();
+
+        }else{
+
+            readyForPower();
+
+        }
+
+    },700);
+
+}else{
+
+    button.classList.add("wrong");
+
+    message.textContent=
+        "❌ WRONG... TRY AGAIN, KAKAROT.";
+
+}
+
+}
+
+
+/* =========================
+   POWER INTRO
+========================= */
+
+function readyForPower(){
+
+screen=2;
+
+content.innerHTML=`
+
+<div class="symbol">⚡</div>
+
+<div class="small">
+FINAL TEST
+</div>
+
+<h1>
+READY?
+</h1>
+
+<h2>
+LET'S TEST YOUR POWER LEVEL.
+</h2>
+
+<p>
+Every tap will release more of your hidden power.
+</p>
+
+<p>
+The final stage requires
+<strong>25 taps.</strong>
+</p>
+
+<button id="beginPower">
+START POWER TEST 🔥
+</button>
+
+`;
+
+document.getElementById("beginPower")
+.addEventListener("click",function(e){
+
+    e.stopPropagation();
+
+    startPower();
+
+});
+
+}
+
+
+/* =========================
+   POWER SCREEN
+========================= */
+
+function startPower(){
+
+screen=3;
+
+taps=0;
+
+renderPower();
+
+}
+
+
+/* =========================
+   STAGES
+========================= */
+
+const stages=[
+
+{
+tap:0,
+name:"BASE FORM",
+title:"KAKAROT",
+subtitle:"POWER SLEEPING",
+power:"1,000",
+message:"Your journey begins..."
+},
+
+{
+tap:3,
+name:"POWER SURGE",
+title:"POWER",
+subtitle:"ENERGY RISING",
+power:"5,000",
+message:"You can feel something awakening."
+},
+
+{
+tap:6,
+name:"SUPER SAIYAN",
+title:"SUPER",
+subtitle:"FIRST TRANSFORMATION",
+power:"50,000",
+message:"Your first limit has been broken."
+},
+
+{
+tap:10,
+name:"SUPER SAIYAN 2",
+title:"LIMIT",
+subtitle:"LIGHTNING AWAKENED",
+power:"250,000",
+message:"The power is becoming dangerous."
+},
+
+{
+tap:14,
+name:"SUPER SAIYAN 3",
+title:"OVERDRIVE",
+subtitle:"POWER WITHOUT LIMIT",
+power:"1,000,000",
+message:"Your body can barely contain it."
+},
+
+{
+tap:18,
+name:"GOD POWER",
+title:"DIVINE",
+subtitle:"GODLY ENERGY",
+power:"10,000,000",
+message:"You have entered another realm."
+},
+
+{
+tap:21,
+name:"SUPER SAIYAN BLUE",
+title:"BLUE",
+subtitle:"PERFECT POWER",
+power:"100,000,000",
+message:"Power alone is no longer enough."
+},
+
+{
+tap:23,
+name:"ULTRA INSTINCT — SIGN",
+title:"INSTINCT",
+subtitle:"THE BODY MOVES ALONE",
+power:"???",
+message:"Stop thinking. Let instinct take over."
+},
+
+{
+tap:24,
+name:"ULTRA INSTINCT",
+title:"AWAKENING",
+subtitle:"THE SILVER AURA",
+power:"UNMEASURABLE",
+message:"One final tap..."
+},
+
+{
+tap:25,
+name:"MASTERED ULTRA INSTINCT",
+title:"ULTRA<br>INSTINCT",
+subtitle:"MASTERED",
+power:"∞",
+message:"YOU BROKE EVERY LIMIT."
+}
+
+];
+
+
+/* =========================
+   GET STAGE
+========================= */
+
+function getStage(){
+
+let current=stages[0];
+
+for(const s of stages){
+
+    if(taps>=s.tap){
+
+        current=s;
+
+    }
+
+}
+
+return current;
+
+}
+
+
+/* =========================
+   RENDER POWER
+========================= */
+
+function renderPower(){
+
+const s=getStage();
+
+content.innerHTML=`
+
+<div class="small">
+POWER AWAKENING
+</div>
+
+<h1 id="powerTitle">
+${s.title}
+</h1>
+
+<h2>
+${s.subtitle}
+</h2>
+
+<div id="power">
+POWER: ${s.power}
+</div>
+
+<div id="stage">
+${s.name}
+</div>
+
+<div class="progressBox">
+
+<div id="progress"
+style="width:${(taps/maxTaps)*100}%">
+</div>
+
+</div>
+
+<p id="message">
+${s.message}
+</p>
+
+<div id="tapHint">
+TAP ANYWHERE ⚡
+<br>
+${taps} / ${maxTaps}
+</div>
+
+<button id="reset">
+START AGAIN
+</button>
+
+`;
+
+if(taps===maxTaps){
+
+    finalScreen();
+
+}
+
+}
+
+
+/* =========================
+   TAP POWER
+========================= */
+
+app.addEventListener("click",function(e){
+
+if(screen!==3){
+    return;
+}
+
+if(e.target.id==="reset"){
+    return;
+}
+
+if(taps>=maxTaps){
+    return;
+}
+
+taps++;
+
+powerEffect();
+
+renderPower();
+
+});
+
+
+/* =========================
+   EFFECT
+========================= */
+
+function powerEffect(){
+
+flash.classList.remove("active");
+
+void flash.offsetWidth;
+
+flash.classList.add("active");
+
+
+card.classList.remove("shake");
+
+void card.offsetWidth;
+
+card.classList.add("shake");
+
+setTimeout(()=>{
+
+    card.classList.remove("shake");
+
+},130);
+
+
+/* AURA */
+
+const size=280+(taps*22);
+
+aura.style.width=size+"px";
+
+aura.style.height=size+"px";
+
+aura.style.opacity=
+    .3+(taps/maxTaps)*.7;
+
+
+/* STRONGER BACKGROUND */
+
+if(taps>=10){
+
+document.body.style.background=
+`
+radial-gradient(
+circle at center,
+#304961 0%,
+#101d2e 32%,
+#03060d 70%,
+#000 100%
+)
+`;
+
+}
+
+if(taps>=18){
+
+aura.style.filter="blur(20px)";
+
+}
+
+}
+
+
+/* =========================
+   FINAL SCREEN
+========================= */
+
+function finalScreen(){
+
+screen=4;
+
+document.body.classList.add("shake");
+
+aura.style.width="650px";
+
+aura.style.height="650px";
+
+aura.style.opacity="1";
+
+aura.style.filter="blur(25px)";
+
+setTimeout(()=>{
+
+document.body.classList.remove("shake");
+
+},1500);
+
+
+content.innerHTML=`
+
+<div class="symbol">✧</div>
+
+<div class="small">
+THE FINAL FORM
+</div>
+
+<h1 class="finalGlow">
+ULTRA<br>
+INSTINCT
+</h1>
+
+<h2>
+MASTERED
+</h2>
+
+<div id="power">
+∞
+</div>
+
+<div id="stage">
+POWER LEVEL: UNMEASURABLE
+</div>
+
+<p>
+The mind is silent.
+<br>
+The body moves automatically.
+<br>
+Every limit has been broken.
+</p>
+
+<p>
+<strong>
+KAKAROT HAS AWAKENED. ⚡
+</strong>
+</p>
+
+<p style="margin-top:22px;">
+You actually made it, bro. 👊🔥
+</p>
+
+<button id="reset">
+AWAKEN AGAIN
+</button>
+
+`;
+
+document.getElementById("reset")
+.style.display="block";
+
+document.getElementById("reset")
+.addEventListener("click",function(e){
+
+    e.stopPropagation();
+
+    resetAll();
+
+});
+
+}
+
+
+/* =========================
+   RESET
+========================= */
+
+function resetAll(){
+
+screen=0;
+
+question=0;
+
+taps=0;
+
+aura.style.width="280px";
+
+aura.style.height="280px";
+
+aura.style.opacity=".25";
+
+aura.style.filter="blur(15px)";
+
+document.body.style.background=
+`
+radial-gradient(
+circle at 50% 45%,
+#263b52 0%,
+#101c2d 30%,
+#03060d 70%,
+#000 100%
+)
+`;
+
+intro();
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+intro();
+
+</script>
+
+</body>
+  </html>
